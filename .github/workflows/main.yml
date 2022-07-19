@@ -1,35 +1,35 @@
-# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
 
-name: Gradle Package
+name: Java CI with Gradle
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 16
+    - name: Set up JDK 17
       uses: actions/setup-java@v2
       with:
-        java-version: '16'
-        distribution: 'adopt'
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
-
+        java-version: '17'
+        distribution: 'temurin'
     - name: Build with Gradle
-      run: gradle build
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v2.2.4
+      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
       with:
-        # Artifact name
-        name: Build Jar # optional, default is artifact
-        # A file, directory or wildcard pattern that describes what to upload
-        path: bin
-        # The desired behavior if no files are found using the provided path.
+        arguments: shadowJar
+    - uses: actions/upload-artifact@v2
+      with:
+        name: Artifact
+        path: build/libs
